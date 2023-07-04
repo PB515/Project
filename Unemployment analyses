@@ -1,0 +1,59 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from statsmodels.tsa.seasonal import seasonal_decompose
+from statsmodels.tsa.arima.model import ARIMA
+
+
+data1 = pd.read_csv('Unemployment_Rate_upto_11_2020.csv')
+data2 = pd.read_csv('Unemployment in India.csv')
+
+
+print(data1.head())  # Display the first few rows of dataset 1
+print(data1.info())  # Display data type and missing values information of dataset 1
+print(data2.head())  # Display the first few rows of dataset 2
+print(data2.info())  # Display data type and missing values information of dataset 2
+
+data1['Date'] = pd.to_datetime(data1['Date'])
+data1.set_index('Date', inplace=True)
+data2['Date'] = pd.to_datetime(data2['Date'])
+data2.set_index('Date', inplace=True)
+
+plt.figure(figsize=(10, 6))
+plt.plot(data1['Unemployment Rate'], label='Dataset 1')
+plt.plot(data2['Unemployment Rate'], label='Dataset 2')
+plt.title('Unemployment Rate over Time')
+plt.xlabel('Date')
+plt.ylabel('Unemployment Rate')
+plt.legend()
+plt.show()
+
+result1 = seasonal_decompose(data1['Unemployment Rate'], model='additive', period=12)
+result2 = seasonal_decompose(data2['Unemployment Rate'], model='additive', period=12)
+
+result1.plot()
+plt.title('Dataset 1: Unemployment Rate Decomposition')
+plt.show()
+
+result2.plot()
+plt.title('Dataset 2: Unemployment Rate Decomposition')
+plt.show()
+
+
+
+train_size = int(len(data1) * 0.8)
+train_data, test_data = data1[:train_size], data1[train_size:]
+
+
+model = ARIMA(train_data['Unemployment Rate'], order=(1, 1, 1))
+model_fit = model.fit()
+
+predictions = model_fit.predict(start=len(train_data), end=len(data1)-1, typ='levels')
+
+plt.figure(figsize=(10, 6))
+plt.plot(test_data.index, test_data['Unemployment Rate'], label='Actual')
+plt.plot(test_data.index, predictions, label='Predicted')
+plt.title('Dataset 1: Unemployment Rate - Actual vs Predicted')
+plt.xlabel('Date')
+plt.ylabel('Unemployment Rate')
+plt.legend()
+plt.show()
