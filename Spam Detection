@@ -1,0 +1,43 @@
+import re
+
+spam_patterns = [
+    "earn money",
+    "make money",
+    "get rich",
+    "work from home",
+    "free money",
+    "opportunity",
+    "investment",
+    "credit score",
+    "debt relief",
+    "weight loss",
+    "diet pill",
+    "viagra",
+    "Cialis",
+    "online pharmacy",
+    "lottery",
+    "prize",
+    "free gift",
+    "special offer",
+    "limited time",
+]
+
+def is_spam(subject, body):
+    for pattern in spam_patterns:
+        if re.search(pattern, subject, re.IGNORECASE) or re.search(pattern, body, re.IGNORECASE):
+            return True
+
+    hyperlink_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
+    if re.search(hyperlink_pattern, body):
+        return True
+
+    return False
+
+
+subject = "Make money fast!"
+body = "Earn $1000 per day from home with this amazing opportunity! Click here to learn more: https://example.com"
+
+if is_spam(subject, body):
+    print("This email is spam!")
+else:
+    print("This email is not spam.")
